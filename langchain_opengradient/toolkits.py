@@ -83,7 +83,8 @@ class OpenGradientToolkit(BaseToolkit):
 
     # TODO: This method must be implemented to list tools.
     def get_tools(self) -> List[BaseTool]:
-        raise NotImplementedError()
+        """Get list of tools available in OpenGradient toolkit."""
+        return self.tools
     
     def add_tool(self, tool: BaseTool) -> None:
         """Add tool to the list of tools for the OpenGradient Agentkit."""
@@ -106,6 +107,7 @@ class OpenGradientToolkit(BaseToolkit):
         Example usage:
             from og_langchain.toolkits import OpenGradientToolkit
 
+            TODO(Kyle): Fill me in
 
         """
         tool = create_run_model_tool(tool_type=ToolType.LANGCHAIN, 
@@ -133,7 +135,18 @@ class OpenGradientToolkit(BaseToolkit):
             from og_langchain.toolkits import OpenGradientToolkit
             
             toolkit = OpenGradientToolkit()
-            toolkit.create_read_workflow_tool()
+            btc_workflow_tool = toolkit.create_read_workflow_tool(
+                tool_type=ToolType.LANGCHAIN,
+                workflow_contract_address="0x6e0641925b845A1ca8aA9a890C4DEF388E9197e0",
+                tool_name="ETH_Price_Forecast",
+                tool_description="Reads latest forecast for ETH price",
+                output_formatter=lambda x: x,
+            )
+
+            toolkit.add_tool(btc_workflow_tool)
+
+            for tool in toolkit.get_tools():
+                print(tool)
         """
         tool = create_read_workflow_tool(tool_type=ToolType.LANGCHAIN,
                                          workflow_contract_address=workflow_contract_address,
