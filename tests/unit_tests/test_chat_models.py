@@ -2,8 +2,9 @@
 
 from typing import Type
 
-from langchain_opengradient.chat_models import ChatOpenGradient
 from langchain_tests.unit_tests import ChatModelUnitTests
+
+from langchain_opengradient.chat_models import ChatOpenGradient
 
 
 class TestChatOpenGradientUnit(ChatModelUnitTests):

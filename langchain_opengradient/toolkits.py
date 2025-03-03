@@ -118,14 +118,39 @@ class OpenGradientToolkit(BaseToolkit):
         """
         Wrapper for create_run_model_tool from OpenGradient AlphaSense library.
 
-        This function creates a langchain compatible tool to run inferences on the 
+        This function creates a langchain compatible tool to run inferences on the
         OpenGradient network.
 
         Example usage:
             from og_langchain.toolkits import OpenGradientToolkit
+            import opengradient as og
 
-            TODO(Kyle): Fill me in
+            toolkit = OpenGradientToolkit()
 
+            class ExampleInputSchema(BaseModel):
+                open_high_low_close: List[List] = Field(
+                    description="[Open, High, Low, Close] prices for the 10 most recent"
+                    )
+
+            def GetInputData():
+                ... User defined function that gathers live-data. ...
+
+            eth_volatility_tool = toolkit.create_run_model_tool(
+                model_cid = "QmRhcpDXfYCKsimTmJYrAVM4Bbvck59Zb2onj3MHv9Kw5N",
+                tool_name = "one_hour_eth_usdt_volatility",
+                input_getter = GetInputData(),
+                output_formatter = lambda x: x,
+                input_schema = ExampleInputSchema,
+                tool_description = "Generates the volatility measurement for the "\
+                                   "ETH/USDT trading pair based on the latest 10 "\
+                                   "measurements in the last hour.",
+                inference_mode = og.InferenceMode.VANILLA,
+            )
+
+            toolkit.add_tool(eth_volatility_tool)
+
+            for tool in toolkit.get_tools():
+                print(tool)
         """
         tool = create_run_model_tool(
             tool_type=ToolType.LANGCHAIN,
@@ -150,7 +175,7 @@ class OpenGradientToolkit(BaseToolkit):
         """
         Wrapper for create_read_workflow_tool from OpenGradient AlphaSense library.
 
-        This function creates a langchain compatible tool to read workflows on the 
+        This function creates a langchain compatible tool to read workflows on the
         OpenGradient network.
 
         Example usage:

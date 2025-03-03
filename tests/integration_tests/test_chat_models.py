@@ -2,8 +2,9 @@
 
 from typing import Type
 
-from langchain_opengradient.chat_models import ChatOpenGradient
 from langchain_tests.integration_tests import ChatModelIntegrationTests
+
+from langchain_opengradient.chat_models import ChatOpenGradient
 
 
 class TestChatParrotLinkIntegration(ChatModelIntegrationTests):

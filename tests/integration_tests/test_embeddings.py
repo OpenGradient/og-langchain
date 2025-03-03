@@ -2,8 +2,9 @@
 
 from typing import Type
 
-from langchain_opengradient.embeddings import OpenGradientEmbeddings
 from langchain_tests.integration_tests import EmbeddingsIntegrationTests
+
+from langchain_opengradient.embeddings import OpenGradientEmbeddings
 
 
 class TestParrotLinkEmbeddingsIntegration(EmbeddingsIntegrationTests):

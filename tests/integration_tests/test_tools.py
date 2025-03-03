@@ -1,7 +1,8 @@
 from typing import Type
 
-from langchain_opengradient.tools import OpenGradientTool
 from langchain_tests.integration_tests import ToolsIntegrationTests
+
+from langchain_opengradient.tools import OpenGradientTool
 
 
 class TestParrotMultiplyToolIntegration(ToolsIntegrationTests):
