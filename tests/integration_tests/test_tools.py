@@ -1,14 +1,14 @@
 from enum import Enum
+from typing import Any, Dict
 
-import opengradient as og
+import opengradient as og  # type: ignore
 import pytest
 from langchain_core.tools import BaseTool
 from langchain_tests.integration_tests import ToolsIntegrationTests
-from opengradient import InferenceResult, ModelOutput
+from opengradient import InferenceResult, ModelOutput  # type: ignore
 from pydantic import BaseModel, Field
 
 from langchain_opengradient.toolkits import OpenGradientToolkit
-from typing import Any, Dict
 
 
 @pytest.mark.usefixtures("mock_env")
@@ -16,7 +16,7 @@ class TestOpenGradientRunModelNoSchemaToolIntegration(ToolsIntegrationTests):
     @property
     def tool_constructor(self) -> BaseTool:
         # model_input_provider has no inputs, so tool_input_schema not necessary
-        def model_input_provider() -> dict:
+        def model_input_provider() -> Dict[str, list]:
             return {
                 "open_high_low_close": [
                     [2535.79, 2535.79, 2505.37, 2515.36],
@@ -49,7 +49,7 @@ class TestOpenGradientRunModelNoSchemaToolIntegration(ToolsIntegrationTests):
         return tool
 
     @property
-    def tool_invoke_params_example(self) -> dict:
+    def tool_invoke_params_example(self) -> Dict[str, Any]:
         """This tool call has no arguments."""
         return {}
 
@@ -69,13 +69,13 @@ class TestOpenGradientRunModelWithSchemaToolIntegration(ToolsIntegrationTests):
             token: Token = Field(description="Token name specified by user.")
 
         # These functions would normally get live data from an exchange.
-        def get_eth_data() -> dict:
+        def get_eth_data() -> Dict[str, list]:
             return {"price_series": [2010.1, 2012.3, 2020.1, 2019.2]}
 
-        def get_btc_data() -> dict:
+        def get_btc_data() -> Dict[str, list]:
             return {"price_series": [100001.1, 100013.2, 100149.2, 99998.1]}
 
-        def model_input_provider(**llm_input: Any) -> dict:
+        def model_input_provider(**llm_input: Any) -> Dict[str, list]:
             token = llm_input.get("token")
             if token == Token.BTC:
                 return get_btc_data()
@@ -102,7 +102,7 @@ class TestOpenGradientRunModelWithSchemaToolIntegration(ToolsIntegrationTests):
         return tool
 
     @property
-    def tool_invoke_params_example(self) -> dict:
+    def tool_invoke_params_example(self) -> Dict[str, Any]:
         """
         Returns the example input argument of a token enum representing BTC.
         """
@@ -130,7 +130,7 @@ class TestOpenGradientReadWorkflowIntegration(ToolsIntegrationTests):
         return tool
 
     @property
-    def tool_invoke_params_example(self) -> dict:
+    def tool_invoke_params_example(self) -> Dict[str, Any]:
         """
         Read workflow tool calls do not take in any tool inputs. The smart contract
         addresses that are being read from are already hard-coded in the tool

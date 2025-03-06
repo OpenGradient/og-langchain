@@ -1,13 +1,13 @@
 """Unit testing for the OpenGradient toolkit functions."""
 
-from types import Any, Dict
+from typing import Any, Dict
 from unittest.mock import patch
 
-import opengradient as og
+import opengradient as og  # type: ignore
 import pytest
 from langchain_core.tools import BaseTool
-from opengradient import InferenceResult, ModelOutput
-from opengradient.alphasense import (
+from opengradient import InferenceResult, ModelOutput  # type: ignore
+from opengradient.alphasense import (  # type: ignore
     ToolType,
 )
 from pydantic import BaseModel, Field
@@ -63,7 +63,7 @@ def test_create_run_model_tool_error() -> None:
     model_cid = "Example_CID"
     tool_name = "Example run model tool"
 
-    def model_input_provider(data: Any) -> Dict:
+    def model_input_provider(data: Any) -> Dict[str, str]:
         return {"input": "example input getter function"}
 
     def model_output_formatter(output: InferenceResult) -> str:
@@ -116,7 +116,7 @@ def test_create_run_model_tool_success() -> None:
     model_cid = "Example_CID"
     tool_name = "Example run model tool"
 
-    def model_input_provider(data: Any) -> Dict:
+    def model_input_provider(data: Any) -> Dict[str, str]:
         return {"input": "example input getter function"}
 
     def model_output_formatter(output: InferenceResult) -> str:

@@ -3,10 +3,10 @@
 import os
 from typing import Callable, List, Optional, Type
 
-import opengradient as og
+import opengradient as og  # type: ignore
 from langchain_core.tools import BaseTool, BaseToolkit
-from opengradient import InferenceResult
-from opengradient.alphasense import (
+from opengradient import InferenceResult  # type: ignore
+from opengradient.alphasense import (  # type: ignore
     ToolType,
     create_read_workflow_tool,
     create_run_model_tool,
