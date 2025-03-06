@@ -15,34 +15,33 @@ from pydantic import BaseModel, Field
 
 
 class OpenGradientToolkit(BaseToolkit):
-    # TODO: Replace all TODOs in docstring. See example docstring:
-    # https://github.com/langchain-ai/langchain/blob/c123cb2b304f52ab65db4714eeec46af69a861ec/libs/community/langchain_community/agent_toolkits/sql/toolkit.py#L19
     """OpenGradient toolkit.
 
-    # TODO: Replace with relevant packages, env vars, etc.
     Setup:
-        Install ``langchain-opengradient`` and set environment variable ``OPENGRADIENT_API_KEY``.
+    Install ``langchain-opengradient`` and set environment variable ``OPENGRADIENT_PRIVATE_KEY``.
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-            pip install -U langchain-opengradient
-            export OPENGRADIENT_API_KEY="your-api-key"
+        pip install -U langchain-opengradient
+        export OPENGRADIENT_PRIVATE_KEY="your-api-key"
 
-    # TODO: Populate with relevant params.
     Key init args:
-        arg 1: type
-            description
-        arg 2: type
-            description
+        private_key: str
+            Your OpenGradient API private key for authentication. If not provided,
+            the OPENGRADIENT_PRIVATE_KEY environment variable will be used.
 
-    # TODO: Replace with relevant init params.
+            You can get your own OpenGradient API key by running
+            .. code-block:: bash
+
+                opengradient config init
+
     Instantiate:
         .. code-block:: python
 
-            from langchain-opengradient import OpenGradientToolkit
+            from langchain_opengradient import OpenGradientToolkit
 
             toolkit = OpenGradientToolkit(
-                # ...
+                private_key="your-api-key"  # Optional if env var is set
             )
 
     Tools:
@@ -52,16 +51,47 @@ class OpenGradientToolkit(BaseToolkit):
 
         .. code-block:: none
 
-            # TODO: Example output.
+            [
+                one_hour_eth_usdt_volatility({}): Generate the live 1 hour volatility measurement for the ETH/USDT trading pair.,
+                ETH_Price_Forecast({}): Reads latest forecast for ETH price
+            ]
 
     Use within an agent:
         .. code-block:: python
 
             from langgraph.prebuilt import create_react_agent
+            from langchain_openai import ChatOpenAI
+
+            llm = ChatOpenAI()
+            toolkit = OpenGradientToolkit()
+
+            # Create a volatility measurement tool for ETH/USDT
+            def model_input_provider():
+                return {
+                    "open_high_low_close": [
+                        [2535.79, 2535.79, 2505.37, 2515.36],
+                        [2515.37, 2516.37, 2497.27, 2506.94],
+                        # ... more price data
+                    ]
+                }
+
+            def output_formatter(inference_result):
+                return format(float(inference_result.model_output["Y"].item()), ".3%")
+
+            volatility_tool = toolkit.create_run_model_tool(
+                model_cid="QmRhcpDXfYCKsimTmJYrAVM4Bbvck59Zb2onj3MHv9Kw5N",
+                tool_name="eth_usdt_volatility",
+                model_input_provider=model_input_provider,
+                model_output_formatter=output_formatter,
+                tool_description="Generates volatility measurement for ETH/USDT",
+            )
+
+            toolkit.add_tool(volatility_tool)
+            tools = toolkit.get_tools()
 
             agent_executor = create_react_agent(llm, tools)
 
-            example_query = "..."
+            example_query = "What's the current volatility of ETH/USDT?"
 
             events = agent_executor.stream(
                 {"messages": [("user", example_query)]},
@@ -71,9 +101,22 @@ class OpenGradientToolkit(BaseToolkit):
                 event["messages"][-1].pretty_print()
 
         .. code-block:: none
+        Example Output:
+        ================================ Human Message =================================
 
-             # TODO: Example output.
+        What's the current volatility of ETH/USDT?
+        ================================== Ai Message ==================================
+        Tool Calls:
+        eth_usdt_volatility (chatcmpl-tool-92d6de9b46454d55aa5e845dc5a6ed84)
+        Call ID: chatcmpl-tool-92d6de9b46454d55aa5e845dc5a6ed84
+        Args:
+        ================================= Tool Message =================================
+        Name: eth_usdt_volatility
 
+        0.038%
+        ================================== Ai Message ==================================
+
+        The most recent 1 hour volatility measure for the trading pair ETH/USDT is 0.038%.
     """  # noqa: E501
 
     model_config = {"arbitrary_types_allowed": True}
@@ -96,14 +139,12 @@ class OpenGradientToolkit(BaseToolkit):
         self.client = og.init(private_key=private_key, email=None, password=None)
         self.tools = []
 
-    # TODO: This method must be implemented to list tools.
     def get_tools(self) -> List[BaseTool]:
         """Get list of tools available in OpenGradient toolkit."""
         return self.tools
 
     def add_tool(self, tool: BaseTool) -> None:
         """Add tool to the list of tools for the OpenGradient Agentkit."""
-        # Maybe add a check here
         self.tools.append(tool)
 
     def create_run_model_tool(
