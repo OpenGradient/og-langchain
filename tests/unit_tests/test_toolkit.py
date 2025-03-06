@@ -1,10 +1,12 @@
 """Unit testing for the OpenGradient toolkit functions."""
 
+from types import Any, Dict
 from unittest.mock import patch
 
 import opengradient as og
 import pytest
 from langchain_core.tools import BaseTool
+from opengradient import InferenceResult, ModelOutput
 from opengradient.alphasense import (
     ToolType,
 )
@@ -16,14 +18,14 @@ from langchain_opengradient.toolkits import OpenGradientToolkit
 class MockTool(BaseTool):
     """Mocktool that inherits from Basetool for unit tests."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         return
 
-    def _run(self):
+    def _run(self) -> int:
         return 0
 
 
-def test_toolkit_initialization_error():
+def test_toolkit_initialization_error() -> None:
     """Test that toolkit does not initialize without OpenGradient API key."""
     with pytest.raises(
         ValueError, match="OPENGRADIENT_PRIVATE_KEY environment variable is not set"
@@ -32,7 +34,7 @@ def test_toolkit_initialization_error():
 
 
 @pytest.mark.usefixtures("mock_env")
-def test_toolkit_initialization_success():
+def test_toolkit_initialization_success() -> None:
     """Test that toolkit initializes properly."""
     toolkit = OpenGradientToolkit()
 
@@ -40,7 +42,7 @@ def test_toolkit_initialization_success():
 
 
 @pytest.mark.usefixtures("mock_env")
-def test_add_tool():
+def test_add_tool() -> None:
     """Test that tools can be added and are returned by the get_tools method."""
     toolkit = OpenGradientToolkit()
 
@@ -51,7 +53,7 @@ def test_add_tool():
 
 
 @pytest.mark.usefixtures("mock_env")
-def test_create_run_model_tool_error():
+def test_create_run_model_tool_error() -> None:
     """Test error flow with function create_run_model_tool."""
 
     class ExampleInputSchema(BaseModel):
@@ -61,10 +63,10 @@ def test_create_run_model_tool_error():
     model_cid = "Example_CID"
     tool_name = "Example run model tool"
 
-    def model_input_provider(data):
+    def model_input_provider(data: Any) -> Dict:
         return {"input": "example input getter function"}
 
-    def model_output_formatter(output):
+    def model_output_formatter(output: InferenceResult) -> str:
         return str(output)
 
     tool_description = "This tool is an example tool."
@@ -104,7 +106,7 @@ def test_create_run_model_tool_error():
 
 
 @pytest.mark.usefixtures("mock_env")
-def test_create_run_model_tool_success():
+def test_create_run_model_tool_success() -> None:
     """Test that create_run_model_tool returns a Langchain compatible tool."""
 
     class ExampleInputSchema(BaseModel):
@@ -114,10 +116,10 @@ def test_create_run_model_tool_success():
     model_cid = "Example_CID"
     tool_name = "Example run model tool"
 
-    def model_input_provider(data):
+    def model_input_provider(data: Any) -> Dict:
         return {"input": "example input getter function"}
 
-    def model_output_formatter(output):
+    def model_output_formatter(output: InferenceResult) -> str:
         return str(output)
 
     tool_description = "This tool is an example tool."
@@ -153,12 +155,12 @@ def test_create_run_model_tool_success():
 
 
 @pytest.mark.usefixtures("mock_env")
-def test_create_read_workflow_tool_error():
+def test_create_read_workflow_tool_error() -> None:
     """Test error flow with function create_read_workflow_tool."""
     workflow_contract_address = "0x12345"
     tool_name = "Example read workflow tool"
 
-    def output_formatter(output):
+    def output_formatter(output: ModelOutput) -> str:
         return str(output)
 
     tool_description = "This tool is an example tool."
@@ -192,12 +194,12 @@ def test_create_read_workflow_tool_error():
 
 
 @pytest.mark.usefixtures("mock_env")
-def test_create_read_workflow_tool_success():
+def test_create_read_workflow_tool_success() -> None:
     """Test that create_read_workflow_tool returns a Langchain compatible tool."""
     workflow_contract_address = "0x12345"
     tool_name = "Example read workflow tool"
 
-    def output_formatter(output):
+    def output_formatter(output: ModelOutput) -> str:
         return str(output)
 
     tool_description = "This tool is an example tool."

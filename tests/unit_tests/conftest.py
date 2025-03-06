@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.fixture
-def mock_env(monkeypatch):
+def mock_env(monkeypatch) -> None:
     """Set up mock environment variables for OpenGradient credentials."""
     # Note that these are test private keys
     monkeypatch.setenv(

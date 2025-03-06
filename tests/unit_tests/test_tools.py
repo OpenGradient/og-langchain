@@ -15,7 +15,7 @@ class MockInputSchema(BaseModel):
     values: List[float] = Field(description="List of values to process")
 
 
-def mock_model_input_provider() -> None:
+def mock_model_input_provider() -> dict:
     return {"example": "getter"}
 
 
