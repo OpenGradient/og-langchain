@@ -15,11 +15,11 @@ class MockInputSchema(BaseModel):
     values: List[float] = Field(description="List of values to process")
 
 
-def mock_input_getter() -> None:
+def mock_model_input_provider() -> None:
     return {"example": "getter"}
 
 
-def mock_output_formatter(response) -> str:
+def mock_model_output_formatter(response) -> str:
     return f"Processed result: {response}"
 
 
@@ -41,9 +41,9 @@ class TestOpenGradientRunModelToolUnit(ToolsUnitTests):
             tool = toolkit.create_run_model_tool(
                 model_cid="QmTest123456789",
                 tool_name="test_model_tool",
-                input_getter=mock_input_getter,
-                output_formatter=mock_output_formatter,
-                input_schema=MockInputSchema,
+                model_input_provider=mock_model_input_provider,
+                model_output_formatter=mock_model_output_formatter,
+                tool_input_schema=MockInputSchema,
                 tool_description="Test model tool for unit testing",
                 inference_mode=og.InferenceMode.VANILLA,
             )
@@ -80,7 +80,6 @@ class TestOpenGradientReadWorkflowToolUnit(ToolsUnitTests):
                 workflow_contract_address="0x123456789",
                 tool_name="test_workflow_tool",
                 tool_description="Test model tool for unit testing",
-                output_formatter=mock_output_formatter,
             )
 
             return tool

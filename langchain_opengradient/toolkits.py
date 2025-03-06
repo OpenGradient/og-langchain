@@ -5,6 +5,7 @@ from typing import Callable, List, Optional, Type
 
 import opengradient as og
 from langchain_core.tools import BaseTool, BaseToolkit
+from opengradient import InferenceResult
 from opengradient.alphasense import (
     ToolType,
     create_read_workflow_tool,
@@ -109,9 +110,9 @@ class OpenGradientToolkit(BaseToolkit):
         self,
         model_cid: str,
         tool_name: str,
-        input_getter: Callable,
-        output_formatter: Callable[..., str] = lambda x: x,
-        input_schema: Optional[Type[BaseModel]] = None,
+        model_input_provider: Callable[..., InferenceResult],
+        model_output_formatter: Callable[..., str],
+        tool_input_schema: Optional[Type[BaseModel]] = None,
         tool_description: str = "Executes the given ML model",
         inference_mode: og.InferenceMode = og.InferenceMode.VANILLA,
     ) -> BaseTool:
@@ -121,6 +122,40 @@ class OpenGradientToolkit(BaseToolkit):
         This function creates a langchain compatible tool to run inferences on the
         OpenGradient network.
 
+        Args:
+            model_cid (str): The CID of the OpenGradient model to be executed.
+            tool_name (str): The name to assign to the created tool. This will be used
+                to identify and invoke the tool within the agent.
+            model_input_provider (Callable): A function that takes in the 
+                tool_input_schema with arguments filled by the agent and returns input 
+                data required by the model.
+
+                The function should return data in a format compatible with the model's 
+                expectations.
+            model_output_formatter (Callable[..., str]): A function that takes the 
+                output of the OpenGradient infer method (with type InferenceResult) and 
+                formats it into a string.
+
+                This is required to ensure the output is compatible with the tool 
+                framework.
+
+                InferenceResult has attributes:
+                    * transaction_hash (str): Blockchain hash for the transaction
+                    * model_output (Dict[str, np.ndarray]): Output of the ONNX model
+            tool_input_schema (Type[BaseModel], optional): A Pydantic BaseModel class 
+                defining the input schema.
+
+                The defined schema will be used as input keyword arguments for the 
+                `model_input_provider` function. If no arguments are required for 
+                the `model_input_provider` function then this schema can be 
+                unspecified.
+
+                Default is None -- an empty schema will be provided for LangChain.
+            tool_description (str, optional): A description of what the tool does.
+                Defaults to "Executes the given ML model".
+            inference_mode (og.InferenceMode, optional): The inference mode to use 
+                when running the model. Defaults to VANILLA.
+                
         Example usage:
             from og_langchain.toolkits import OpenGradientToolkit
             import opengradient as og
@@ -129,7 +164,8 @@ class OpenGradientToolkit(BaseToolkit):
 
             class ExampleInputSchema(BaseModel):
                 open_high_low_close: List[List] = Field(
-                    description="[Open, High, Low, Close] prices for the 10 most recent"
+                    description="[Open, High, Low, Close] "
+                                "prices for the 10 most recent"
                     )
 
             def GetInputData():
@@ -138,9 +174,12 @@ class OpenGradientToolkit(BaseToolkit):
             eth_volatility_tool = toolkit.create_run_model_tool(
                 model_cid = "QmRhcpDXfYCKsimTmJYrAVM4Bbvck59Zb2onj3MHv9Kw5N",
                 tool_name = "one_hour_eth_usdt_volatility",
-                input_getter = GetInputData(),
-                output_formatter = lambda x: x,
-                input_schema = ExampleInputSchema,
+                model_input_provider = GetInputData(),
+                model_output_formatter = lambda x: format(
+                    float(x.model_output["Y"].item()),
+                    ".3%"
+                    ),
+                tool_input_schema = ExampleInputSchema,
                 tool_description = "Generates the volatility measurement for the "\
                                    "ETH/USDT trading pair based on the latest 10 "\
                                    "measurements in the last hour.",
@@ -156,9 +195,9 @@ class OpenGradientToolkit(BaseToolkit):
             tool_type=ToolType.LANGCHAIN,
             model_cid=model_cid,
             tool_name=tool_name,
-            input_getter=input_getter,
-            output_formatter=output_formatter,
-            input_schema=input_schema,
+            model_input_provider=model_input_provider,
+            model_output_formatter=model_output_formatter,
+            tool_input_schema=tool_input_schema,
             tool_description=tool_description,
             inference_mode=inference_mode,
         )
@@ -177,6 +216,19 @@ class OpenGradientToolkit(BaseToolkit):
 
         This function creates a langchain compatible tool to read workflows on the
         OpenGradient network.
+
+        Args:
+            workflow_contract_address (str): The address of the workflow contract
+            from which to read results.
+            tool_name (str): The name to assign to the created tool. This will be
+                used to identify and invoke the tool within the agent.
+            tool_description (str): A description of what the tool does and how
+                it processes the workflow results.
+            output_formatter (Callable[..., str], optional): A function that takes
+                the workflow output and formats it into a string. This ensures the
+                output is compatible with the tool framework.
+
+                Default returns string as is.
 
         Example usage:
             from og_langchain.toolkits import OpenGradientToolkit

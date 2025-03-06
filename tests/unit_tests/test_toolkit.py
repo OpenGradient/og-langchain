@@ -61,10 +61,10 @@ def test_create_run_model_tool_error():
     model_cid = "Example_CID"
     tool_name = "Example run model tool"
 
-    def input_getter(data):
+    def model_input_provider(data):
         return {"input": "example input getter function"}
 
-    def output_formatter(output):
+    def model_output_formatter(output):
         return str(output)
 
     tool_description = "This tool is an example tool."
@@ -83,9 +83,9 @@ def test_create_run_model_tool_error():
             toolkit.create_run_model_tool(
                 model_cid=model_cid,
                 tool_name=tool_name,
-                input_getter=input_getter,
-                output_formatter=output_formatter,
-                input_schema=ExampleInputSchema,
+                model_input_provider=model_input_provider,
+                model_output_formatter=model_output_formatter,
+                tool_input_schema=ExampleInputSchema,
                 tool_description=tool_description,
                 inference_mode=inference_mode,
             )
@@ -95,9 +95,9 @@ def test_create_run_model_tool_error():
             tool_type=ToolType.LANGCHAIN,
             model_cid=model_cid,
             tool_name=tool_name,
-            input_getter=input_getter,
-            output_formatter=output_formatter,
-            input_schema=ExampleInputSchema,
+            model_input_provider=model_input_provider,
+            model_output_formatter=model_output_formatter,
+            tool_input_schema=ExampleInputSchema,
             tool_description=tool_description,
             inference_mode=inference_mode,
         )
@@ -114,10 +114,10 @@ def test_create_run_model_tool_success():
     model_cid = "Example_CID"
     tool_name = "Example run model tool"
 
-    def input_getter(data):
+    def model_input_provider(data):
         return {"input": "example input getter function"}
 
-    def output_formatter(output):
+    def model_output_formatter(output):
         return str(output)
 
     tool_description = "This tool is an example tool."
@@ -132,9 +132,9 @@ def test_create_run_model_tool_success():
         tool = toolkit.create_run_model_tool(
             model_cid=model_cid,
             tool_name=tool_name,
-            input_getter=input_getter,
-            output_formatter=output_formatter,
-            input_schema=ExampleInputSchema,
+            model_input_provider=model_input_provider,
+            model_output_formatter=model_output_formatter,
+            tool_input_schema=ExampleInputSchema,
             tool_description=tool_description,
             inference_mode=inference_mode,
         )
@@ -143,9 +143,9 @@ def test_create_run_model_tool_success():
             tool_type=ToolType.LANGCHAIN,
             model_cid=model_cid,
             tool_name=tool_name,
-            input_getter=input_getter,
-            output_formatter=output_formatter,
-            input_schema=ExampleInputSchema,
+            model_input_provider=model_input_provider,
+            model_output_formatter=model_output_formatter,
+            tool_input_schema=ExampleInputSchema,
             tool_description=tool_description,
             inference_mode=inference_mode,
         )
