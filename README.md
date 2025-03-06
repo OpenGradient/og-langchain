@@ -1,6 +1,8 @@
 # langchain-opengradient
 
-This package contains the LangChain integration with OpenGradient. More information about OpenGradient can be found [here](https://docs.opengradient.ai/).
+This package contains the LangChain integration with OpenGradient. 
+
+More information about OpenGradient can be found [here](https://docs.opengradient.ai/).
 
 ## Installation
 
